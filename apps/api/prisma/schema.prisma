@@ -1,0 +1,101 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "cjs"
+  importFileExtension = ""
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(uuid()) @db.Uuid
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  attempts     Attempt[]
+
+  @@map("users")
+}
+
+enum QuizVersionStatus {
+  draft
+  active
+  archived
+}
+
+/// Immutable once published: changing questions means creating a new version.
+model QuizVersion {
+  id             String            @id @default(uuid()) @db.Uuid
+  quizKey        String            @map("quiz_key")
+  version        Int
+  status         QuizVersionStatus @default(draft)
+  /// Public question definition (QuizDefinitionSchema).
+  definition     Json
+  /// Server-only scoring config: { strategy, params }.
+  scoring        Json
+  /// Key of the report template used for attempts of this version.
+  reportTemplate String            @map("report_template")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  attempts       Attempt[]
+
+  @@unique([quizKey, version])
+  @@map("quiz_versions")
+}
+
+model Attempt {
+  id             String         @id @default(uuid()) @db.Uuid
+  quizVersionId  String         @map("quiz_version_id") @db.Uuid
+  userId         String?        @map("user_id") @db.Uuid
+  /// sha256 of the anonymous claim token, cleared once the attempt is linked to a user.
+  claimTokenHash String?        @unique @map("claim_token_hash")
+  completedAt    DateTime       @default(now()) @map("completed_at")
+  quizVersion    QuizVersion    @relation(fields: [quizVersionId], references: [id])
+  user           User?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers        AttemptAnswer[]
+  result         AttemptResult?
+  report         Report?
+
+  @@index([userId, completedAt(sort: Desc)])
+  @@map("attempts")
+}
+
+/// One row per answered question, keyed by the stable question key so answers
+/// stay comparable across quiz versions.
+model AttemptAnswer {
+  attemptId   String  @map("attempt_id") @db.Uuid
+  questionKey String  @map("question_key")
+  value       Json
+  attempt     Attempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@id([attemptId, questionKey])
+  @@index([questionKey])
+  @@map("attempt_answers")
+}
+
+model AttemptResult {
+  attemptId String  @id @map("attempt_id") @db.Uuid
+  strategy  String
+  outcome   String
+  score     Int
+  maxScore  Int     @map("max_score")
+  details   Json
+  attempt   Attempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@map("attempt_results")
+}
+
+/// Snapshot of the rendered report, so later logic changes never rewrite
+/// reports a user has already received.
+model Report {
+  id              String   @id @default(uuid()) @db.Uuid
+  attemptId       String   @unique @map("attempt_id") @db.Uuid
+  template        String
+  templateVersion Int      @map("template_version")
+  sections        Json
+  createdAt       DateTime @default(now()) @map("created_at")
+  attempt         Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
