@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+/* Tokens from the Figma file ("Test for dev") */
+@theme {
+  --color-page: #f7f8fa; /* Background/Light blue 03 */
+  --color-surface: #f1f4f7; /* Background/Light blue 02 */
+  --color-line: #e8edf2; /* Background/Light blue 01 */
+  --color-ink: #04182c; /* Text/Dark blue 01 */
+  --color-ink-2: #1c2d3f; /* Text/Dark blue 02 */
+  --color-ink-3: #485664; /* Text/Dark blue 03 */
+  --color-slate: #3b5779;
+  --color-accent: #1066b9; /* Accent/Blue 01 */
+  --color-accent-2: #b4cce3; /* Accent/Blue 02 */
+  --color-accent-3: #e5f2ff; /* Accent/Blue 03 */
+  --color-accent-4: #f3f7fa; /* Accent/Blue 04 */
+  --color-accent-line: #87b3dc;
+  --color-primary: #116a73; /* Primary/500 */
+  --color-primary-hover: #0d565d;
+  --color-primary-soft: #e6f2f2; /* Primary/50 */
+  --color-footer: #18334d; /* Primary/950 */
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-geologica);
+  --shadow-modal:
+    0 10px 22px rgba(131, 147, 165, 0.02), 0 41px 41px rgba(131, 147, 165, 0.02),
+    0 91px 55px rgba(131, 147, 165, 0.01);
+  --shadow-selected: 0 3px 6px rgba(131, 147, 165, 0.1), 0 23px 7px rgba(131, 147, 165, 0.05);
+}
+
+body {
+  background: var(--color-page);
+  color: var(--color-ink);
+}
