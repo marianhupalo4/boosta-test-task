@@ -13,6 +13,8 @@
 | `apps/api` | NestJS 11, Prisma 7, PostgreSQL |
 | `packages/shared` | Спільні типи та zod-схеми, тобто контракт між web і api |
 
+**Робоча версія:** https://boosta-test-task.vercel.app (API: https://boosta-test-task.onrender.com/api/health). Безкоштовний план Render засинає після простою, тому перше відкриття може тривати до 50 секунд.
+
 ## Запуск локально
 
 Потрібні Node.js 22+, pnpm 10 і Docker.
