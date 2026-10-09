@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: adhd
+      POSTGRES_PASSWORD: adhd
+      POSTGRES_DB: adhd
+    ports:
+      - '5434:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U adhd']
+      interval: 2s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  db-data:

@@ -1,0 +1,18 @@
+{
+  "name": "boosta-test-task",
+  "private": true,
+  "packageManager": "pnpm@10.10.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build:shared": "pnpm --filter @adhd/shared build",
+    "dev": "pnpm build:shared && pnpm --parallel --filter @adhd/shared --filter api --filter web dev",
+    "build": "pnpm --filter api --filter web build",
+    "db:up": "docker compose up -d --wait db",
+    "db:setup": "pnpm build:shared && pnpm --filter api db:generate && pnpm --filter api db:deploy && pnpm --filter api db:seed",
+    "test": "pnpm build:shared && pnpm --filter api test && pnpm --filter api test:e2e",
+    "test:ui": "pnpm --filter web test:e2e",
+    "lint": "pnpm --filter api --filter web lint"
+  }
+}
